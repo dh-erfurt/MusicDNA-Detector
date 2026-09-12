@@ -1,0 +1,97 @@
+"""MusicDNA Detector public API."""
+
+from .analysis import analyze, analyze_audio, analyze_file
+from .audio import AudioDecodingError, SoundFileLoader, ffmpeg_available
+from .contract import (
+    ANALYSIS_RESULT_SCHEMA_VERSION,
+    load_analysis_result_schema,
+    validate_analysis_result_payload,
+)
+from .mapping import (
+    NoteMapping,
+    estimate_tuning_reference_hz,
+    frequency_to_midi_float,
+    frequency_to_note,
+    midi_to_pitch_name,
+    round_half_up,
+)
+from .models import (
+    AnalysisConfig,
+    AnalysisDiagnostics,
+    AnalysisProfileName,
+    AnalysisResult,
+    AnalysisWarning,
+    AudioBuffer,
+    AudioSource,
+    BackendInfo,
+    BackendMetadata,
+    CoverageRecoveryMode,
+    DecoderBackend,
+    Diagnostics,
+    LoaderConfig,
+    NoteEvent,
+    PitchConfig,
+    PitchEstimatorName,
+    PitchEvent,
+    PitchTrack,
+    PyinBackendName,
+    RecoveryPitchMethod,
+    SegmentationConfig,
+    SourceMetadata,
+    analysis_config_for_profile,
+)
+from .note_hmm import NoteHmmSegmenter
+from .pitch import PyinPitchEstimator, build_pitch_estimator
+from .protocols import AudioLoader, PitchEstimator, PitchSegmenter
+from .recovery import RawOnsetCoverageRecoverer, recover_coverage_gaps
+from .segmentation import build_segmenter
+
+__all__ = [
+    "ANALYSIS_RESULT_SCHEMA_VERSION",
+    "AnalysisConfig",
+    "AnalysisDiagnostics",
+    "AnalysisProfileName",
+    "AnalysisResult",
+    "AnalysisWarning",
+    "AudioBuffer",
+    "AudioDecodingError",
+    "AudioLoader",
+    "AudioSource",
+    "BackendInfo",
+    "BackendMetadata",
+    "CoverageRecoveryMode",
+    "DecoderBackend",
+    "Diagnostics",
+    "LoaderConfig",
+    "NoteEvent",
+    "NoteHmmSegmenter",
+    "NoteMapping",
+    "PitchConfig",
+    "PitchEstimator",
+    "PitchEstimatorName",
+    "PitchEvent",
+    "PitchSegmenter",
+    "PitchTrack",
+    "PyinBackendName",
+    "PyinPitchEstimator",
+    "RawOnsetCoverageRecoverer",
+    "RecoveryPitchMethod",
+    "SegmentationConfig",
+    "SoundFileLoader",
+    "SourceMetadata",
+    "analysis_config_for_profile",
+    "analyze",
+    "analyze_audio",
+    "analyze_file",
+    "build_pitch_estimator",
+    "build_segmenter",
+    "estimate_tuning_reference_hz",
+    "ffmpeg_available",
+    "frequency_to_midi_float",
+    "frequency_to_note",
+    "load_analysis_result_schema",
+    "midi_to_pitch_name",
+    "recover_coverage_gaps",
+    "round_half_up",
+    "validate_analysis_result_payload",
+]

@@ -1,0 +1,96 @@
+MusicDNA Detector — third-party provenance and notices
+========================================================
+
+The original project code is distributed under the MIT License in LICENSE. The
+distribution also contains adapted portions of librosa under the ISC License;
+the combined package license expression is ``MIT AND ISC``. This notice records
+the upstream source and algorithm references used by the in-house DSP
+implementation so that the implementation can be audited and redistributed with
+the required attribution.
+
+librosa behavioral/source reference
+-----------------------------------
+
+The modules below contain portions derived and adapted from selected numerical
+behavior in librosa 0.11.0. They are specialized for the mono, centered float64
+path used by this detector and were modified to preserve the reference outputs;
+librosa itself is not bundled in the runtime package. The equality tests use
+librosa as the development-time reference.
+
+  src/musicdna_detector/dsp/yin.py
+  src/musicdna_detector/dsp/observation.py
+  src/musicdna_detector/dsp/viterbi.py
+  src/musicdna_detector/dsp/pyin.py
+  src/musicdna_detector/dsp/spectral.py
+  src/musicdna_detector/dsp/peaks.py
+
+MusicDNA-specific modifications to these modules remain licensed under the MIT
+License in LICENSE. The upstream ISC terms apply to the derived/adapted portions.
+
+The corresponding upstream implementations and license are:
+
+  https://github.com/librosa/librosa/tree/0.11.0
+  https://github.com/librosa/librosa/blob/0.11.0/librosa/core/pitch.py
+  https://github.com/librosa/librosa/blob/0.11.0/librosa/sequence.py
+  https://github.com/librosa/librosa/blob/0.11.0/librosa/core/spectrum.py
+  https://github.com/librosa/librosa/blob/0.11.0/librosa/onset.py
+  https://github.com/librosa/librosa/blob/0.11.0/librosa/util/utils.py
+  https://github.com/librosa/librosa/blob/0.11.0/LICENSE.md
+
+The upstream license text is reproduced here because the implementation is a
+source-informed port and the notice should travel with source distributions:
+
+ISC License
+
+Copyright (c) 2013--2023, librosa development team.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Algorithm references
+--------------------
+
+The pYIN method is based on:
+
+  Mathias Mauch and Simon Dixon, "PYIN: A fundamental frequency estimator
+  using probabilistic threshold distributions," 2014 IEEE International
+  Conference on Acoustics, Speech and Signal Processing (ICASSP), 2014,
+  pp. 659--663. DOI: 10.1109/ICASSP.2014.6853678.
+
+The underlying YIN method is based on:
+
+  Alain de Cheveigné and Hideki Kawahara, "YIN, a fundamental frequency
+  estimator for speech and music," The Journal of the Acoustical Society
+  of America 111.4 (2002): 1917--1930. DOI: 10.1121/1.1458024.
+
+The note-transcription design is informed by:
+
+  Matthias Mauch, Chris Cannam, Rachel Bittner, George Fazekas, Justin Salamon,
+  Jiajie Dai, Juan Bello and Simon Dixon, "Computer-aided Melody Note
+  Transcription Using the Tony Software: Accuracy and Efficiency," Proceedings
+  of the First International Conference on Technologies for Music Notation and
+  Representation (TENOR'15), pp. 23--30, 2015.
+  https://www.tenor-conference.org/proceedings/2015/04-Mauch-Tony.pdf
+
+Algorithm papers are cited as scholarly sources; they are not additional code
+licenses. Runtime dependencies (NumPy, SciPy, SoundFile) are installed separately
+and are not vendored by this repository; their own distributions carry their
+respective licenses.
+
+GPL provenance note
+-------------------
+
+Repository history and the current implementation indicate that no source code
+from the GPL-licensed c4dm/pyin Vamp plugin was incorporated. The project contributor
+has confirmed this provenance for the current implementation. The pYIN implementation is based
+on the published algorithm and the independently ported librosa behavior described
+above; no GPL code from the Vamp plugin is distributed here.

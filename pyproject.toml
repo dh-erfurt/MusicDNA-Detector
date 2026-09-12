@@ -1,0 +1,104 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "musicdna-detector"
+version = "0.9.0"
+description = "Experimental pitch and duration extraction from short monophonic humming and singing queries"
+readme = "README.rst"
+requires-python = ">=3.10"
+license = "MIT AND ISC"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.txt"]
+authors = [
+  { name = "Anna Neovesky" },
+  { name = "Finn Johann Romeis" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+]
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "soundfile>=0.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/dh-erfurt/MusicDNA-Detector"
+Repository = "https://github.com/dh-erfurt/MusicDNA-Detector"
+Issues = "https://github.com/dh-erfurt/MusicDNA-Detector/issues"
+
+[project.scripts]
+musicdna-detector = "musicdna_detector.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "jsonschema>=4.23",
+  "librosa>=0.11,<0.12",
+  "mypy>=1.10",
+  "pytest>=8",
+  "ruff>=0.5",
+  "tomli>=2; python_version < '3.11'",
+]
+librosa = [
+  "librosa>=0.11,<0.12",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/musicdna_detector"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.env",
+  "/.mypy_cache",
+  "/.pytest_cache",
+  "/.ruff_cache",
+  "/.venv",
+  "/cache",
+  "/dist",
+  "/node_modules",
+  "/System.Collections.Hashtable.out",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+cache-dir = "cache/ruff"
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+cache_dir = "cache/mypy"
+files = [
+  "src/musicdna_detector",
+]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "soundfile"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[dependency-groups]
+dev = [
+  "build>=1.2",
+  "jsonschema>=4.23",
+  "librosa>=0.11,<0.12",
+  "mypy>=1.10",
+  "pytest>=8",
+  "ruff>=0.5",
+  "tomli>=2; python_version < '3.11'",
+]

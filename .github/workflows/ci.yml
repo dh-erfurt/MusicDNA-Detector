@@ -1,0 +1,63 @@
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.10"
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+      - run: uv sync --locked
+      - name: Check audio environment
+        run: >-
+          uv run python -c "from musicdna_detector import ffmpeg_available;
+          assert ffmpeg_available(), 'FFmpeg is not available on PATH'"
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run pytest
+      - name: Exercise FFmpeg fallback safety tests
+        run: uv run pytest tests/test_audio.py -k ffmpeg
+      - run: uv run mypy --strict
+      - run: uv run python -m build
+      - name: Verify wheel release contract
+        run: |
+          python - <<'PY'
+          from glob import glob
+          from zipfile import ZipFile
+
+          wheel = glob("dist/*.whl")
+          assert len(wheel) == 1, wheel
+          with ZipFile(wheel[0]) as archive:
+              names = archive.namelist()
+              metadata_name = next(name for name in names if name.endswith("/METADATA"))
+              metadata = archive.read(metadata_name).decode()
+          notices = [name for name in names if name.endswith("THIRD_PARTY_NOTICES.txt")]
+          assert len(notices) == 1, notices
+          assert "/licenses/THIRD_PARTY_NOTICES.txt" in notices[0], notices
+          assert "musicdna_detector/schemas/musicdna-analysis-v0.schema.json" in names
+          assert "Version: 0.9.0" in metadata
+          assert "Description-Content-Type: text/x-rst" in metadata
+          assert "MusicDNA Detector" in metadata
+          assert "Provides-Extra: librosa" in metadata
+          PY
+      - name: Install and import built wheel
+        run: |
+          python -m venv /tmp/musicdna-wheel
+          /tmp/musicdna-wheel/bin/python -m pip install --disable-pip-version-check dist/*.whl
+          /tmp/musicdna-wheel/bin/python -c "import musicdna_detector; print(musicdna_detector.__name__)"
+          /tmp/musicdna-wheel/bin/musicdna-detector --help

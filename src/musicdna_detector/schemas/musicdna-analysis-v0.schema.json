@@ -1,0 +1,384 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dh-erfurt/MusicDNA-Detector/blob/main/src/musicdna_detector/schemas/musicdna-analysis-v0.schema.json",
+  "title": "MusicDNA Detector analysis contract: musicdna-analysis-v0",
+  "description": "Serialized MusicDNA Detector analysis envelope for the preliminary pre-1.0 release, including events, pitch_track, config, source, backend, and diagnostics.",
+  "$comment": "musicdna-analysis-v0 names the complete Detector analysis envelope; it is not the producer-neutral musicdna-events-v0 event subset. Compatible implementation and validation changes that preserve every musicdna-analysis-v0 payload remain on this contract. Removing or renaming fields, changing their type or meaning, or adding output rejected by this closed schema requires a new contract name and immutable schema file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "events",
+    "pitch_track",
+    "duration_seconds",
+    "sample_rate",
+    "config",
+    "source",
+    "backend",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema_version": { "const": "musicdna-analysis-v0" },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/noteEvent" }
+    },
+    "pitch_track": { "$ref": "#/$defs/pitchTrack" },
+    "duration_seconds": { "$ref": "#/$defs/nonNegativeNumber" },
+    "sample_rate": { "$ref": "#/$defs/positiveInteger" },
+    "config": { "$ref": "#/$defs/analysisConfig" },
+    "source": { "$ref": "#/$defs/sourceMetadata" },
+    "backend": { "$ref": "#/$defs/backendMetadata" },
+    "diagnostics": { "$ref": "#/$defs/diagnostics" }
+  },
+  "$defs": {
+    "nonNegativeNumber": { "type": "number", "minimum": 0 },
+    "positiveNumber": { "type": "number", "exclusiveMinimum": 0 },
+    "probability": { "type": "number", "minimum": 0, "maximum": 1 },
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "positiveInteger": { "type": "integer", "minimum": 1 },
+    "noteEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_seconds",
+        "end_seconds",
+        "duration_seconds",
+        "duration_ms",
+        "frequency_hz",
+        "midi_pitch",
+        "pitch_name",
+        "confidence",
+        "cents"
+      ],
+      "properties": {
+        "start_seconds": { "$ref": "#/$defs/nonNegativeNumber" },
+        "end_seconds": { "$ref": "#/$defs/positiveNumber" },
+        "duration_seconds": { "$ref": "#/$defs/positiveNumber" },
+        "duration_ms": { "$ref": "#/$defs/positiveNumber" },
+        "frequency_hz": { "$ref": "#/$defs/positiveNumber" },
+        "midi_pitch": { "type": "integer" },
+        "pitch_name": { "type": "string", "minLength": 1 },
+        "confidence": { "$ref": "#/$defs/probability" },
+        "cents": { "type": "number" }
+      }
+    },
+    "pitchTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "times_seconds",
+        "frequencies_hz",
+        "voiced_probabilities",
+        "levels_dbfs",
+        "onset_strengths"
+      ],
+      "properties": {
+        "times_seconds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonNegativeNumber" }
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/positiveNumber" },
+              { "type": "null" }
+            ]
+          }
+        },
+        "voiced_probabilities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/probability" }
+        },
+        "levels_dbfs": {
+          "type": "array",
+          "items": { "type": ["number", "null"] }
+        },
+        "onset_strengths": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "$ref": "#/$defs/nonNegativeNumber" }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "loaderConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_sample_rate", "decoder_policy", "ffmpeg_timeout_seconds"],
+      "properties": {
+        "target_sample_rate": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveInteger" },
+            { "type": "null" }
+          ]
+        },
+        "decoder_policy": { "enum": ["native_only", "native_then_ffmpeg"] },
+        "ffmpeg_timeout_seconds": { "$ref": "#/$defs/positiveNumber" }
+      }
+    },
+    "pitchConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "pyin_backend": { "const": "librosa" } },
+            "required": ["pyin_backend"]
+          },
+          "then": {
+            "properties": {
+              "pyin_beam": { "type": "null" },
+              "grid_independent_voicing": { "const": false }
+            }
+          }
+        }
+      ],
+      "required": [
+        "fmin_hz",
+        "fmax_hz",
+        "frame_length",
+        "hop_length",
+        "level_window_seconds",
+        "silence_threshold_dbfs",
+        "estimator",
+        "pyin_backend",
+        "pyin_beam",
+        "smoothing_tv_weight",
+        "smoothing_median_frames",
+        "pitch_resolution",
+        "grid_independent_voicing"
+      ],
+      "properties": {
+        "fmin_hz": { "$ref": "#/$defs/positiveNumber" },
+        "fmax_hz": { "$ref": "#/$defs/positiveNumber" },
+        "frame_length": { "$ref": "#/$defs/positiveInteger" },
+        "hop_length": { "$ref": "#/$defs/positiveInteger" },
+        "level_window_seconds": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveNumber" },
+            { "type": "null" }
+          ]
+        },
+        "silence_threshold_dbfs": { "type": "number" },
+        "estimator": { "enum": ["pyin"] },
+        "pyin_backend": { "enum": ["librosa", "native"] },
+        "pyin_beam": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveNumber" },
+            { "type": "null" }
+          ]
+        },
+        "smoothing_tv_weight": { "$ref": "#/$defs/nonNegativeNumber" },
+        "smoothing_median_frames": { "$ref": "#/$defs/nonNegativeInteger" },
+        "pitch_resolution": { "$ref": "#/$defs/positiveNumber" },
+        "grid_independent_voicing": { "type": "boolean" }
+      }
+    },
+    "segmentationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "offset_probability",
+        "minimum_duration_seconds",
+        "maximum_gap_seconds",
+        "silence_threshold_dbfs",
+        "tuning_reference_hz",
+        "segmenter",
+        "energy_onset_window_frames",
+        "onset_feature",
+        "spectral_flux_onset_threshold",
+        "spectral_flux_onset_window_frames",
+        "spectral_flux_hop_length",
+        "coverage_recovery",
+        "raw_onset_recovery_min_duration_seconds",
+        "raw_onset_recovery_max_duration_seconds",
+        "raw_onset_recovery_context_seconds",
+        "raw_onset_recovery_min_voiced_frames",
+        "raw_onset_recovery_min_onset_strength",
+        "raw_onset_recovery_event_margin_seconds",
+        "raw_onset_recovery_hop_length",
+        "raw_onset_recovery_max_pitch_spread_semitones",
+        "raw_onset_recovery_pitch_method",
+        "consolidate_notes",
+        "consolidation_max_gap_seconds",
+        "consolidation_same_pitch_semitones",
+        "consolidation_min_rearticulation_dbfs",
+        "note_hmm_observation_trust",
+        "note_hmm_states_per_semitone",
+        "state_pitch_sigma_semitones",
+        "state_change_distance_sigma",
+        "state_change_penalty",
+        "state_silence_transition_penalty",
+        "state_voiced_silence_penalty",
+        "state_unvoiced_note_penalty",
+        "state_onset_reward",
+        "state_onset_window_frames",
+        "note_hmm_attack_sigma_factor",
+        "note_hmm_attack_unvoiced_penalty",
+        "note_hmm_attack_self_cost",
+        "note_hmm_rearticulation_penalty",
+        "note_hmm_onset_snap_seconds",
+        "offset_release_drop_dbfs",
+        "note_pitch_frames",
+        "note_pitch_aggregate"
+      ],
+      "properties": {
+        "offset_probability": { "$ref": "#/$defs/probability" },
+        "minimum_duration_seconds": { "$ref": "#/$defs/positiveNumber" },
+        "maximum_gap_seconds": { "$ref": "#/$defs/nonNegativeNumber" },
+        "silence_threshold_dbfs": { "type": "number" },
+        "tuning_reference_hz": { "$ref": "#/$defs/positiveNumber" },
+        "segmenter": { "const": "note_hmm" },
+        "energy_onset_window_frames": { "$ref": "#/$defs/positiveInteger" },
+        "onset_feature": {
+          "enum": ["energy", "spectral_flux", "energy_and_spectral_flux"]
+        },
+        "spectral_flux_onset_threshold": { "$ref": "#/$defs/nonNegativeNumber" },
+        "spectral_flux_onset_window_frames": { "$ref": "#/$defs/positiveInteger" },
+        "spectral_flux_hop_length": { "$ref": "#/$defs/positiveInteger" },
+        "coverage_recovery": { "enum": ["off", "raw_onset"] },
+        "raw_onset_recovery_min_duration_seconds": {
+          "$ref": "#/$defs/nonNegativeNumber"
+        },
+        "raw_onset_recovery_max_duration_seconds": {
+          "$ref": "#/$defs/nonNegativeNumber"
+        },
+        "raw_onset_recovery_context_seconds": { "$ref": "#/$defs/nonNegativeNumber" },
+        "raw_onset_recovery_min_voiced_frames": { "$ref": "#/$defs/positiveInteger" },
+        "raw_onset_recovery_min_onset_strength": {
+          "$ref": "#/$defs/nonNegativeNumber"
+        },
+        "raw_onset_recovery_event_margin_seconds": {
+          "$ref": "#/$defs/nonNegativeNumber"
+        },
+        "raw_onset_recovery_hop_length": { "$ref": "#/$defs/positiveInteger" },
+        "raw_onset_recovery_max_pitch_spread_semitones": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveNumber" },
+            { "type": "null" }
+          ]
+        },
+        "raw_onset_recovery_pitch_method": { "enum": ["median", "modal_median"] },
+        "consolidate_notes": { "type": "boolean" },
+        "consolidation_max_gap_seconds": { "$ref": "#/$defs/nonNegativeNumber" },
+        "consolidation_same_pitch_semitones": { "$ref": "#/$defs/nonNegativeNumber" },
+        "consolidation_min_rearticulation_dbfs": {
+          "$ref": "#/$defs/nonNegativeNumber"
+        },
+        "note_hmm_observation_trust": { "$ref": "#/$defs/nonNegativeNumber" },
+        "note_hmm_states_per_semitone": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "state_pitch_sigma_semitones": { "$ref": "#/$defs/positiveNumber" },
+        "state_change_distance_sigma": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveNumber" },
+            { "type": "null" }
+          ]
+        },
+        "state_change_penalty": { "$ref": "#/$defs/nonNegativeNumber" },
+        "state_silence_transition_penalty": { "$ref": "#/$defs/nonNegativeNumber" },
+        "state_voiced_silence_penalty": { "$ref": "#/$defs/nonNegativeNumber" },
+        "state_unvoiced_note_penalty": { "$ref": "#/$defs/nonNegativeNumber" },
+        "state_onset_reward": { "$ref": "#/$defs/nonNegativeNumber" },
+        "state_onset_window_frames": { "$ref": "#/$defs/positiveInteger" },
+        "note_hmm_attack_sigma_factor": { "type": "number", "minimum": 1 },
+        "note_hmm_attack_unvoiced_penalty": { "$ref": "#/$defs/nonNegativeNumber" },
+        "note_hmm_attack_self_cost": { "$ref": "#/$defs/nonNegativeNumber" },
+        "note_hmm_rearticulation_penalty": { "$ref": "#/$defs/nonNegativeNumber" },
+        "note_hmm_onset_snap_seconds": { "$ref": "#/$defs/nonNegativeNumber" },
+        "offset_release_drop_dbfs": { "$ref": "#/$defs/nonNegativeNumber" },
+        "note_pitch_frames": { "enum": ["all", "sustain"] },
+        "note_pitch_aggregate": { "enum": ["median", "cents_mean"] }
+      }
+    },
+    "analysisConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "loader",
+        "pitch",
+        "segmentation",
+        "normalize_audio",
+        "normalization_target_dbfs",
+        "normalization_reference_percentile"
+      ],
+      "properties": {
+        "profile": { "enum": ["default", "singing", "humming"] },
+        "loader": { "$ref": "#/$defs/loaderConfig" },
+        "pitch": { "$ref": "#/$defs/pitchConfig" },
+        "segmentation": { "$ref": "#/$defs/segmentationConfig" },
+        "normalize_audio": { "type": "boolean" },
+        "normalization_target_dbfs": { "type": "number", "maximum": 0 },
+        "normalization_reference_percentile": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "sourceMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "format",
+        "original_sample_rate",
+        "analyzed_sample_rate",
+        "channels",
+        "duration_s",
+        "resampled"
+      ],
+      "properties": {
+        "kind": { "enum": ["path", "buffer", "array"] },
+        "format": { "type": ["string", "null"] },
+        "original_sample_rate": { "$ref": "#/$defs/nonNegativeInteger" },
+        "analyzed_sample_rate": { "$ref": "#/$defs/nonNegativeInteger" },
+        "channels": { "$ref": "#/$defs/positiveInteger" },
+        "duration_s": { "$ref": "#/$defs/nonNegativeNumber" },
+        "resampled": { "type": "boolean" }
+      }
+    },
+    "backendMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decoder",
+        "decoder_policy",
+        "pitch_estimator",
+        "segmenter",
+        "ffmpeg_used"
+      ],
+      "properties": {
+        "decoder": { "enum": ["native", "ffmpeg", "memory"] },
+        "decoder_policy": { "enum": ["native_only", "native_then_ffmpeg"] },
+        "pitch_estimator": { "type": "string" },
+        "segmenter": { "type": "string" },
+        "ffmpeg_used": { "type": "boolean" }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["warnings"],
+      "properties": {
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

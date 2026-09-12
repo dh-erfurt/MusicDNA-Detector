@@ -1,0 +1,29 @@
+# CFF citation metadata. See https://citation-file-format.github.io/
+cff-version: 1.2.0
+title: MusicDNA-Detector
+message: "If you use this software, please cite it using these metadata."
+type: software
+abstract: >-
+  Experimental pitch and duration extraction from short monophonic humming and
+  singing queries. It turns audio into a storable note representation (pitch in
+  Hz, duration) for use in query-by-humming and query-by-singing systems over
+  musicological catalogues and can be consumed downstream by the
+  MusicDNA-Encoder.
+authors:
+  - family-names: Neovesky
+    given-names: Anna
+    orcid: "https://orcid.org/0000-0002-0627-8199"
+  - family-names: Romeis
+    given-names: Finn Johann
+    orcid: "https://orcid.org/0009-0003-2867-1615"
+repository-code: "https://github.com/dh-erfurt/MusicDNA-Detector"
+version: "0.9.0"
+date-released: 2026-09-15
+license: MIT AND ISC
+keywords:
+  - query-by-humming
+  - query-by-singing
+  - pitch detection
+  - music information retrieval
+  - digital humanities
+  - monophonic transcription

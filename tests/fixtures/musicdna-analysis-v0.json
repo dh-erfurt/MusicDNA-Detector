@@ -1,0 +1,115 @@
+{
+  "schema_version": "musicdna-analysis-v0",
+  "events": [
+    {
+      "start_seconds": 0.0,
+      "end_seconds": 0.25,
+      "duration_seconds": 0.25,
+      "duration_ms": 250.0,
+      "frequency_hz": 440.0,
+      "midi_pitch": 69,
+      "pitch_name": "A4",
+      "confidence": 0.9,
+      "cents": 0.0
+    }
+  ],
+  "pitch_track": {
+    "times_seconds": [0.0, 0.1],
+    "frequencies_hz": [440.0, null],
+    "voiced_probabilities": [0.9, 0.0],
+    "levels_dbfs": [-12.0, null],
+    "onset_strengths": null
+  },
+  "duration_seconds": 0.25,
+  "sample_rate": 22050,
+  "config": {
+    "profile": "default",
+    "loader": {
+      "target_sample_rate": 22050,
+      "decoder_policy": "native_only",
+      "ffmpeg_timeout_seconds": 30.0
+    },
+    "pitch": {
+      "fmin_hz": 65.406,
+      "fmax_hz": 2093.005,
+      "frame_length": 2048,
+      "hop_length": 256,
+      "level_window_seconds": null,
+      "silence_threshold_dbfs": -60.0,
+      "estimator": "pyin",
+      "pyin_backend": "native",
+      "pyin_beam": null,
+      "smoothing_tv_weight": 0.0,
+      "smoothing_median_frames": 0,
+      "pitch_resolution": 0.1,
+      "grid_independent_voicing": false
+    },
+    "segmentation": {
+      "offset_probability": 0.45,
+      "minimum_duration_seconds": 0.05,
+      "maximum_gap_seconds": 0.04,
+      "silence_threshold_dbfs": -60.0,
+      "tuning_reference_hz": 440.0,
+      "segmenter": "note_hmm",
+      "energy_onset_window_frames": 8,
+      "onset_feature": "energy",
+      "spectral_flux_onset_threshold": 0.3,
+      "spectral_flux_onset_window_frames": 4,
+      "spectral_flux_hop_length": 256,
+      "coverage_recovery": "raw_onset",
+      "raw_onset_recovery_min_duration_seconds": 0.04,
+      "raw_onset_recovery_max_duration_seconds": 0.12,
+      "raw_onset_recovery_context_seconds": 0.08,
+      "raw_onset_recovery_min_voiced_frames": 3,
+      "raw_onset_recovery_min_onset_strength": 0.2,
+      "raw_onset_recovery_event_margin_seconds": 0.01,
+      "raw_onset_recovery_hop_length": 256,
+      "raw_onset_recovery_max_pitch_spread_semitones": null,
+      "raw_onset_recovery_pitch_method": "median",
+      "consolidate_notes": true,
+      "consolidation_max_gap_seconds": 0.25,
+      "consolidation_same_pitch_semitones": 0.75,
+      "consolidation_min_rearticulation_dbfs": 4.0,
+      "note_hmm_observation_trust": 1.0,
+      "note_hmm_states_per_semitone": 1,
+      "state_pitch_sigma_semitones": 0.75,
+      "state_change_distance_sigma": null,
+      "state_change_penalty": 3.0,
+      "state_silence_transition_penalty": 2.0,
+      "state_voiced_silence_penalty": 4.0,
+      "state_unvoiced_note_penalty": 1.5,
+      "state_onset_reward": 0.15,
+      "state_onset_window_frames": 4,
+      "note_hmm_attack_sigma_factor": 2.0,
+      "note_hmm_attack_unvoiced_penalty": 0.3,
+      "note_hmm_attack_self_cost": 0.1,
+      "note_hmm_rearticulation_penalty": 4.0,
+      "note_hmm_onset_snap_seconds": 0.0,
+      "offset_release_drop_dbfs": 0.0,
+      "note_pitch_frames": "all",
+      "note_pitch_aggregate": "median"
+    },
+    "normalize_audio": false,
+    "normalization_target_dbfs": -18.0,
+    "normalization_reference_percentile": 99.0
+  },
+  "source": {
+    "kind": "buffer",
+    "format": null,
+    "original_sample_rate": 22050,
+    "analyzed_sample_rate": 22050,
+    "channels": 1,
+    "duration_s": 0.25,
+    "resampled": false
+  },
+  "backend": {
+    "decoder": "memory",
+    "decoder_policy": "native_only",
+    "pitch_estimator": "PyinPitchEstimator",
+    "segmenter": "NoteHmmSegmenter",
+    "ffmpeg_used": false
+  },
+  "diagnostics": {
+    "warnings": []
+  }
+}
