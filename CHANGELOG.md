@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.9.0] — unreleased
+## [0.9.0] — 2026-09-15
 
 - Initial public release.
 - Added humming and singing profiles.

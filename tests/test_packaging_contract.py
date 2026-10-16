@@ -42,11 +42,11 @@ def test_experimental_release_identity_is_consistent() -> None:
     assert "date-released: 2026-09-15" in citation
     assert "family-names: Neovesky" in citation
     assert "family-names: Romeis" in citation
-    assert "## [0.9.0] — unreleased" in changelog
+    assert "## [0.9.0] — 2026-09-15" in changelog
     assert "## [0.5.1]" not in changelog
 
     public_changelog = _public_file("CHANGELOG.md").read_text(encoding="utf-8")
-    assert "## [0.9.0] — unreleased" in public_changelog
+    assert "## [0.9.0] — 2026-09-15" in public_changelog
     assert "Initial public release." in public_changelog
 
 
